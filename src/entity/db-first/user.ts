@@ -4,7 +4,7 @@ import {user_role} from "./user_role";
 
 
 @Entity("user",{schema:"donorday" } )
-@Index("IDX_78a916df40e02a9deb1c4b75ed",["username",],{unique:true})
+@Index("IDX_78a916df40e02a9deb1c4b75ed",["email",],{unique:true})
 export class user {
 
     @PrimaryGeneratedColumn({
@@ -24,16 +24,9 @@ export class user {
     @Column("varchar",{ 
         nullable:false,
         unique: true,
-        name:"username"
+        name:"email"
         })
-    username:string;
-        
-
-    @Column("varchar",{ 
-        nullable:false,
-        name:"role"
-        })
-    role:string;
+    email:string;
         
 
     @Column("datetime",{ 

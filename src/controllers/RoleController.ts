@@ -1,14 +1,34 @@
 import { Request, Response } from 'express-serve-static-core';
 import { getRepository } from 'typeorm';
+import { role } from '../entity/db-first/role';
+import { validate } from 'class-validator';
 
-class roleController {
-    static getroles = async (req: Request, res: Response) => {
-    //Get users from database
-    // const users = await userRepository.find({
-    //     select: ["id", "username", "role"] //We dont want to send the passwords on response
-    // });
+export default class RoleController {
 
-    //Send the users object
-    // res.send(users);
-};
+    static getRoles = async (req: Request, res: Response) => {
+        const roleRepository = getRepository(role);
+        const roles = await roleRepository.find({
+            select: ["id", "description"]
+        });
+
+        res.send(roles);
+    };
+
+    static async addRole(req: Request, res: Response) {
+        const roleRepository = getRepository(role);
+
+        let newRole: role = { ...req.body }
+        roleRepository.insert(newRole);
+
+        const errors = await validate(role);
+
+        if (!errors.length) {
+            res.status(400).send(errors);
+        }
+        else {
+            res.send(newRole);
+        }
+
+    }
+
 }
