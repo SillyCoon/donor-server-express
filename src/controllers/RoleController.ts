@@ -1,12 +1,12 @@
 import { Request, Response } from 'express-serve-static-core';
 import { getRepository } from 'typeorm';
-import { role } from '../entity/db-first/role';
+import { Role } from '../entity/db-first/role';
 import { validate } from 'class-validator';
 
 export default class RoleController {
 
     static getRoles = async (req: Request, res: Response) => {
-        const roleRepository = getRepository(role);
+        const roleRepository = getRepository(Role);
         const roles = await roleRepository.find({
             select: ["id", "description"]
         });
@@ -15,12 +15,12 @@ export default class RoleController {
     };
 
     static async addRole(req: Request, res: Response) {
-        const roleRepository = getRepository(role);
+        const roleRepository = getRepository(Role);
 
-        let newRole: role = { ...req.body }
+        let newRole: Role = { ...req.body }
         roleRepository.insert(newRole);
 
-        const errors = await validate(role);
+        const errors = await validate(Role);
 
         if (!errors.length) {
             res.status(400).send(errors);

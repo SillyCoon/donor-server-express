@@ -1,10 +1,10 @@
-import {BaseEntity,Column,Entity,Index,JoinColumn,JoinTable,ManyToMany,ManyToOne,OneToMany,OneToOne,PrimaryColumn,PrimaryGeneratedColumn,RelationId} from "typeorm";
-import {donation_point_role} from "./donation_point_role";
-import {user_role} from "./user_role";
+import {Column,Entity,OneToMany} from "typeorm";
+import {DonationPointRole} from "./donation-point-role";
+import {UserRole} from "./user-role";
 
 
 @Entity("role",{schema:"donorday" } )
-export class role {
+export class Role {
 
     @Column("varchar",{ 
         nullable:false,
@@ -23,12 +23,12 @@ export class role {
         
 
    
-    @OneToMany(type=>donation_point_role, donation_point_role=>donation_point_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
-    donationPointRoles:donation_point_role[];
+    @OneToMany(()=>DonationPointRole, donation_point_role=>donation_point_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
+    donationPointRoles:DonationPointRole[];
     
 
    
-    @OneToMany(type=>user_role, user_role=>user_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
-    userRoles:user_role[];
+    @OneToMany(()=>UserRole, user_role=>user_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
+    userRoles:UserRole[];
     
 }
