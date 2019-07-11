@@ -1,7 +1,7 @@
 import { Column, Entity, Index, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Donorinfo } from "./donorinfo";
 import { UserRole } from "./user-role";
-
+import * as bcrypt from "bcryptjs";
 
 @Entity("user", { schema: "donorday" })
 @Index("IDX_78a916df40e02a9deb1c4b75ed", ["email",], { unique: true })
@@ -53,5 +53,13 @@ export class BaseUser {
 
     @OneToMany(() => UserRole, user_role => user_role.user, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     userRoles: UserRole[];
+
+    hashPassword() {
+        this.password = bcrypt.hashSync(this.password, 8);
+    }
+
+    checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
+        return bcrypt.compareSync(unencryptedPassword, this.password);
+    }
 
 }
