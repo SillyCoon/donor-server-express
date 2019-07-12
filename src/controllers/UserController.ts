@@ -1,3 +1,4 @@
+import { BaseUser } from './../entity/db-first/user';
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
@@ -8,25 +9,29 @@ class UserController {
 
   static listAll = async (req: Request, res: Response) => {
     //Get users from database
-    const userRepository = getRepository(User);
-    const users = await userRepository.find({
-      select: ["id", "username", "role"] //We dont want to send the passwords on response
-    });
+    const userRepository = getRepository(BaseUser);
+    const users = await userRepository.createQueryBuilder('user')
+      .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
+      .select(['user.id', 'user.email', 'userRole.roleId'])
+      .getMany()
 
     //Send the users object
     res.send(users);
   };
 
   static getOneById = async (req: Request, res: Response) => {
-    //Get the ID from the url
     const id: number = req.params.id;
 
-    //Get the user from database
-    const userRepository = getRepository(User);
+    console.log(id);
+
+    const userRepository = getRepository(BaseUser);
     try {
-      const user = await userRepository.findOneOrFail(id, {
-        select: ["id", "username", "role"] //We dont want to send the password on response
-      });
+      const user = await userRepository.createQueryBuilder('user')
+        .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
+        .select(['user.id', 'user.email', 'userRole.roleId'])
+        .where('user.id = :id', { id })
+        .getOne()
+      res.send(user);
     } catch (error) {
       res.status(404).send("User not found");
     }
@@ -34,11 +39,11 @@ class UserController {
 
   static newUser = async (req: Request, res: Response) => {
     //Get parameters from the body
-    let { username, password, role } = req.body;
-    let user = new User();
-    user.username = username;
+    console.log(req.body);
+    let { email, password } = req.body;
+    let user = new BaseUser();
+    user.email = email;
     user.password = password;
-    user.role = role;
 
     //Validade if the parameters are ok
     const errors = await validate(user);
@@ -51,7 +56,7 @@ class UserController {
     user.hashPassword();
 
     //Try to save. If fails, the username is already in use
-    const userRepository = getRepository(User);
+    const userRepository = getRepository(BaseUser);
     try {
       await userRepository.save(user);
     } catch (e) {

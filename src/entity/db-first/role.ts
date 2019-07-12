@@ -25,9 +25,7 @@ export class Role {
    
     @OneToMany(()=>DonationPointRole, donation_point_role=>donation_point_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
     donationPointRoles:DonationPointRole[];
-    
-
-   
+      
     @OneToMany(()=>UserRole, user_role=>user_role.role,{ onDelete: 'RESTRICT' ,onUpdate: 'RESTRICT' })
     userRoles:UserRole[];
     
