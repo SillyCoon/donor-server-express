@@ -5,8 +5,16 @@ import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 import config from "../config/config";
 import { UserHelper } from '../helpers/user-helper';
+import { Donor } from '../entity/business/Donor';
 
 class AuthController {
+
+    static registration = async(req: Request, res: Response) => {
+        let donor: Donor = req.body as Donor;
+
+        
+    }
+
     static login = async (req: Request, res: Response) => {
         //Check if username and password are set
         let { email, password } = req.body;
@@ -55,8 +63,8 @@ class AuthController {
         }
 
         //Get user from the database
-        const userRepository = getRepository(User);
-        let user: User;
+        const userRepository = getRepository(BaseUser);
+        let user: BaseUser;
         try {
             user = await userRepository.findOneOrFail(id);
         } catch (id) {

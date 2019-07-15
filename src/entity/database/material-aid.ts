@@ -12,8 +12,6 @@ export class MaterialAid {
     @PrimaryGeneratedColumn()
     id: Donorinfo | null;
 
-
-
     @ManyToOne(() => Department, department => department.materialAids, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'department_id' })
     department: Department | null;

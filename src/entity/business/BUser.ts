@@ -1,4 +1,4 @@
-export class BUser {
+export interface BaseUser {
     id: string;
     email: string;
     roles: []
