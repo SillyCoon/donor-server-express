@@ -1,7 +1,6 @@
 import { UserRole } from './../entity/db-first/user-role';
-import { MigrationInterface, QueryRunner, getRepository, Repository } from "typeorm";
+import { MigrationInterface, QueryRunner, getRepository } from "typeorm";
 import { BaseUser } from '../entity/db-first/user';
-import { stringify } from 'querystring';
 
 export class CreateAdminUser1562840905494 implements MigrationInterface {
 
@@ -10,7 +9,7 @@ export class CreateAdminUser1562840905494 implements MigrationInterface {
 
         user.id = 1;
         user.email = 'ahtunget@gmail.com';
-        user.password = 'testPassword'
+        user.password = 'donor'
 
         user.hashPassword();
 

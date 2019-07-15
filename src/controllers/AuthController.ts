@@ -1,3 +1,4 @@
+import { BaseUser } from './../entity/db-first/user';
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
@@ -5,19 +6,24 @@ import { validate } from "class-validator";
 
 import { User } from "../entity/User";
 import config from "../config/config";
+import { UserHelper } from '../helpers/user-helper';
 
 class AuthController {
     static login = async (req: Request, res: Response) => {
         //Check if username and password are set
-        let { username, password } = req.body;
-        if (!(username && password)) {
+        let { email, password } = req.body;
+        if (!(email && password)) {
             res.status(400).send();
         }
         //Get user from database
-        const userRepository = getRepository(User);
-        let user: User;
+        const userRepository = getRepository(BaseUser);
+        let user: any;
         try {
-            user = await userRepository.findOneOrFail({ where: { username } });
+            user = await userRepository.createQueryBuilder('user')
+                .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
+                .select(['user.id', 'user.password', 'user.email', 'userRole.roleId'])
+                .where('user.email = :email', { email })
+                .getOne();
         } catch (error) {
             res.status(401).send();
         }
@@ -28,9 +34,10 @@ class AuthController {
             return;
         }
 
+        console.log({ userId: user.id, username: user.email, roles: UserHelper.rolesToArrayOfRoleIds(user.roles) });
         //Sing JWT, valid for 1 hour
         const token = jwt.sign(
-            { userId: user.id, username: user.username, role: user.role },
+            { userId: user.id, username: user.email, roles: UserHelper.rolesToArrayOfRoleIds(user.roles) },
             config.jwtSecret,
             { expiresIn: "1h" }
         );

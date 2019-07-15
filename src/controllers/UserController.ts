@@ -2,8 +2,7 @@ import { BaseUser } from './../entity/db-first/user';
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
-
-import { User } from "../entity/User";
+import { UserHelper } from '../helpers/user-helper';
 
 class UserController {
 
@@ -22,15 +21,14 @@ class UserController {
   static getOneById = async (req: Request, res: Response) => {
     const id: number = req.params.id;
 
-    console.log(id);
-
     const userRepository = getRepository(BaseUser);
     try {
-      const user = await userRepository.createQueryBuilder('user')
+      const user: any = await userRepository.createQueryBuilder('user')
         .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
         .select(['user.id', 'user.email', 'userRole.roleId'])
         .where('user.id = :id', { id })
         .getOne()
+      user.roles = UserHelper.rolesToArrayOfRoleIds(user.roles);
       res.send(user);
     } catch (error) {
       res.status(404).send("User not found");
@@ -39,7 +37,6 @@ class UserController {
 
   static newUser = async (req: Request, res: Response) => {
     //Get parameters from the body
-    console.log(req.body);
     let { email, password } = req.body;
     let user = new BaseUser();
     user.email = email;
@@ -73,10 +70,10 @@ class UserController {
     const id = req.params.id;
 
     //Get values from the body
-    const { username, role } = req.body;
+    const { email } = req.body;
 
     //Try to find user on database
-    const userRepository = getRepository(User);
+    const userRepository = getRepository(BaseUser);
     let user;
     try {
       user = await userRepository.findOneOrFail(id);
@@ -87,8 +84,7 @@ class UserController {
     }
 
     //Validate the new values on model
-    user.username = username;
-    user.role = role;
+    user.email = email;
     const errors = await validate(user);
     if (errors.length > 0) {
       res.status(400).send(errors);
@@ -99,7 +95,7 @@ class UserController {
     try {
       await userRepository.save(user);
     } catch (e) {
-      res.status(409).send("username already in use");
+      res.status(409).send("email already in use");
       return;
     }
     //After all send a 204 (no content, but accepted) response
@@ -110,8 +106,8 @@ class UserController {
     //Get the ID from the url
     const id = req.params.id;
 
-    const userRepository = getRepository(User);
-    let user: User;
+    const userRepository = getRepository(BaseUser);
+    let user: BaseUser;
     try {
       user = await userRepository.findOneOrFail(id);
     } catch (error) {
