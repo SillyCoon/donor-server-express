@@ -1,4 +1,4 @@
-import { BaseUser } from './../entity/db-first/user';
+import { BaseUser } from '../entity/database/user';
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";

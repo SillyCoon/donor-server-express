@@ -1,6 +1,6 @@
 import { Request, Response } from 'express-serve-static-core';
 import { getRepository } from 'typeorm';
-import { Role } from '../entity/db-first/role';
+import { Role } from '../entity/database/role';
 import { validate } from 'class-validator';
 
 export default class RoleController {

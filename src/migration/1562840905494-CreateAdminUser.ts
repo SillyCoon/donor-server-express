@@ -1,6 +1,6 @@
-import { UserRole } from './../entity/db-first/user-role';
+import { UserRole } from '../entity/database/user-role';
 import { MigrationInterface, QueryRunner, getRepository } from "typeorm";
-import { BaseUser } from '../entity/db-first/user';
+import { BaseUser } from '../entity/database/user';
 
 export class CreateAdminUser1562840905494 implements MigrationInterface {
 

@@ -1,4 +1,4 @@
-import { BaseUser } from './../entity/db-first/user';
+import { BaseUser } from '../entity/database/user';
 import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { UserHelper } from '../helpers/user-helper';
