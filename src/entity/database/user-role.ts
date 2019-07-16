@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
-import { BaseUser } from "./user";
+import { User } from "./user";
 import { Role } from "./role";
 
 
@@ -20,9 +20,9 @@ export class UserRole {
     @Column({ nullable: true, name: 'role_id' })
     roleId: string
 
-    @ManyToOne(type => BaseUser, user => user.userRoles, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+    @ManyToOne(type => User, user => user.userRoles, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'user_id' })
-    user?: BaseUser | null;
+    user?: User | null;
 
     @ManyToOne(type => Role, role => role.userRoles, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'role_id' })

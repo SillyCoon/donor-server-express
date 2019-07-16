@@ -1,4 +1,4 @@
-import { BaseUser } from '../entity/database/user';
+import { User } from '../entity/database/user';
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
@@ -8,7 +8,7 @@ class UserController {
 
   static listAll = async (req: Request, res: Response) => {
     //Get users from database
-    const userRepository = getRepository(BaseUser);
+    const userRepository = getRepository(User);
     const users = await userRepository.createQueryBuilder('user')
       .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
       .select(['user.id', 'user.email', 'userRole.roleId'])
@@ -21,7 +21,7 @@ class UserController {
   static getOneById = async (req: Request, res: Response) => {
     const id: number = req.params.id;
 
-    const userRepository = getRepository(BaseUser);
+    const userRepository = getRepository(User);
     try {
       const user: any = await userRepository.createQueryBuilder('user')
         .leftJoinAndMapMany('user.roles', 'user.userRoles', "userRole")
@@ -38,7 +38,7 @@ class UserController {
   static newUser = async (req: Request, res: Response) => {
     //Get parameters from the body
     let { email, password } = req.body;
-    let user = new BaseUser();
+    let user = new User();
     user.email = email;
     user.password = password;
 
@@ -53,7 +53,7 @@ class UserController {
     user.hashPassword();
 
     //Try to save. If fails, the username is already in use
-    const userRepository = getRepository(BaseUser);
+    const userRepository = getRepository(User);
     try {
       await userRepository.save(user);
     } catch (e) {
@@ -73,7 +73,7 @@ class UserController {
     const { email } = req.body;
 
     //Try to find user on database
-    const userRepository = getRepository(BaseUser);
+    const userRepository = getRepository(User);
     let user;
     try {
       user = await userRepository.findOneOrFail(id);
@@ -106,8 +106,8 @@ class UserController {
     //Get the ID from the url
     const id = req.params.id;
 
-    const userRepository = getRepository(BaseUser);
-    let user: BaseUser;
+    const userRepository = getRepository(User);
+    let user: User;
     try {
       user = await userRepository.findOneOrFail(id);
     } catch (error) {

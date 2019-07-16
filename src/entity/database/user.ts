@@ -5,7 +5,7 @@ import * as bcrypt from "bcryptjs";
 
 @Entity("user", { schema: "donorday" })
 @Index("IDX_78a916df40e02a9deb1c4b75ed", ["email",], { unique: true })
-export class BaseUser {
+export class User {
 
     @PrimaryGeneratedColumn({
         type: "int",
@@ -55,6 +55,7 @@ export class BaseUser {
     userRoles: UserRole[];
 
     hashPassword() {
+        console.log(this.password);
         this.password = bcrypt.hashSync(this.password, 8);
     }
 

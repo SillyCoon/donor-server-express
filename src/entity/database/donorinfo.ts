@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
-import { BaseUser } from "./user";
+import { User } from "./user";
 import { Weight } from "./weight";
 import { Citizenship } from "./citizenship";
 import { Registration } from "./registration";
@@ -14,16 +14,16 @@ import { MaterialAid } from "./material-aid";
 export class Donorinfo {
 
 
-    @OneToOne(() => BaseUser, user => user.donorinfo, { primary: true, nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+    @OneToOne(() => User, user => user.donorinfo, { primary: true, nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'id' })
-    id: BaseUser | null;
+    id?: User | null;
 
 
-    @Column("int", {
+    @Column("varchar", {
         nullable: false,
         name: "first_name"
     })
-    first_name: number;
+    firstName: string;
 
 
     @Column("varchar", {
@@ -39,7 +39,7 @@ export class Donorinfo {
         length: 64,
         name: "last_name"
     })
-    last_name: string;
+    lastName: string;
 
 
     @Column("varchar", {
@@ -58,31 +58,39 @@ export class Donorinfo {
     vk: string;
 
 
+    @Column({ nullable: true, name: 'weight_id' })
+    weightId: number
+
+    @Column({ nullable: true, name: 'citizenship_id' })
+    citizenshipId: number
+
+    @Column({ nullable: true, name: 'registration_id'})
+    registrationId: number
 
     @ManyToOne(() => Weight, weight => weight.donorinfos, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'weight_id' })
-    weight: Weight | null;
+    weight?: Weight | null;
 
 
 
     @ManyToOne(() => Citizenship, citizenship => citizenship.donorinfos, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'citizenship_id' })
-    citizenship: Citizenship | null;
+    citizenship?: Citizenship | null;
 
 
 
     @ManyToOne(() => Registration, registration => registration.donorinfos, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     @JoinColumn({ name: 'registration_id' })
-    registration: Registration | null;
+    registration?: Registration | null;
 
 
 
     @OneToMany(() => DonorTime, donor_time => donor_time.donor, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
-    donorTimes: DonorTime[];
+    donorTimes?: DonorTime[];
 
 
 
     @OneToOne(() => MaterialAid, material_aid => material_aid.id, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
-    materialAid: MaterialAid | null;
+    materialAid?: MaterialAid | null;
 
 }

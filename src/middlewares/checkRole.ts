@@ -1,4 +1,4 @@
-import { BaseUser } from '../entity/database/user';
+import { User } from '../entity/database/user';
 import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { UserHelper } from '../helpers/user-helper';
@@ -9,7 +9,7 @@ export const checkRole = (neededRoles: Array<string>) => {
         const id = res.locals.jwtPayload.userId;
 
         //Get user role from the database
-        const userRepository = getRepository(BaseUser);
+        const userRepository = getRepository(User);
         let user: any;
         try {
             user = await userRepository.createQueryBuilder('user')

@@ -1,4 +1,6 @@
-import { BaseUser } from '../entity/database/user';
+import { BaseUser } from './../entity/business/BUser';
+import { Donorinfo } from './../entity/database/donorinfo';
+import { User } from '../entity/database/user';
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
@@ -9,10 +11,57 @@ import { Donor } from '../entity/business/Donor';
 
 class AuthController {
 
-    static registration = async(req: Request, res: Response) => {
-        let donor: Donor = req.body as Donor;
+    // Только мейл и пароль для получения id и удобства дальнейшей работы
+    static basicRegistration = async (req: Request, res: Response) => {
+        const user = req.body as BaseUser;
+        const userRepository = getRepository(User);
 
-        
+        const creatingUser: User = new User();
+        creatingUser.email = user.email;
+        creatingUser.password = user.password;
+        creatingUser.hashPassword();
+
+        try{
+            await userRepository.save(creatingUser);
+        }
+        catch (error) {
+            res.status(409).send('Email is already in use');
+        }
+
+        const token = jwt.sign(
+            { userId: user.id, username: user.email, roles: [] },
+            config.jwtSecret,
+            { expiresIn: "1h" }
+        );
+
+        //Send the jwt in the response
+        res.send(token);
+    }
+
+    static registration = async (req: Request, res: Response) => {
+        let donor: Donor = req.body as Donor;
+        const donorRepository = getRepository(Donorinfo);
+
+        // Добавляем информацию о доноре
+        const donorInfo: Donorinfo = {
+            firstName: donor.firstName,
+            lastName: donor.lastName,
+            patronymic: donor.patronymic ? donor.patronymic : null,
+            phone: donor.phone,
+            vk: donor.vk,
+            weightId: donor.hasWeight ? 1 : 0,
+            citizenshipId: donor.hasCitizenship ? 1 : 0,
+            registrationId: donor.hasRegistration ? 1 : 0
+        }
+
+        // Добавляем пользователя и его роли
+        const user: User = new User();
+
+        user.password = donor.password;
+        user.email = donor.email;
+        const roles = UserHelper.getRolesFromDonorInfo(donor); 
+
+
     }
 
     static login = async (req: Request, res: Response) => {
@@ -22,7 +71,7 @@ class AuthController {
             res.status(400).send();
         }
         //Get user from database
-        const userRepository = getRepository(BaseUser);
+        const userRepository = getRepository(User);
         let user: any;
         try {
             user = await userRepository.createQueryBuilder('user')
@@ -63,8 +112,8 @@ class AuthController {
         }
 
         //Get user from the database
-        const userRepository = getRepository(BaseUser);
-        let user: BaseUser;
+        const userRepository = getRepository(User);
+        let user: User;
         try {
             user = await userRepository.findOneOrFail(id);
         } catch (id) {

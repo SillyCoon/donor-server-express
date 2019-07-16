@@ -1,10 +1,11 @@
-import { BaseUser } from '../database/user';
+import { User } from '../database/user';
 import { MaterialAidInfo } from './MaterialAidInfo';
 
-export interface Donor extends BaseUser {
+export interface Donor extends User {
     firstName: string;
     lastName: string;
     patronymic?: string;
+    password: string;
     phone: string;
     vk: string;
     hasWeight: boolean;
