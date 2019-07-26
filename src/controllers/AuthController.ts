@@ -74,8 +74,6 @@ class AuthController {
                 userId: userId
             } as UserRole
         });
-
-        console.log()
         const userRoleRepository = getRepository(UserRole);
         await userRoleRepository.save(rolesWithUserId);
 
@@ -111,7 +109,6 @@ class AuthController {
             res.status(401).send();
             return;
         }
-
         //Sing JWT, valid for 1 hour
         const token = jwt.sign(
             { userId: user.id, username: user.email, roles: UserHelper.rolesToArrayOfRoleIds(user.roles) },
