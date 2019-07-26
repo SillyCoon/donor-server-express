@@ -18,7 +18,6 @@ export class Donorinfo {
     @JoinColumn({ name: 'id' })
     id?: User | null;
 
-
     @Column("varchar", {
         nullable: false,
         name: "first_name"

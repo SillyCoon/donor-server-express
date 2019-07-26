@@ -20,7 +20,6 @@ export const checkRole = (neededRoles: Array<string>) => {
         } catch (id) {
             res.status(401).send();
         }
-
         const userRoles = UserHelper.rolesToArrayOfRoleIds(user.roles);
         //Check if array of authorized roles includes the user's role
         if (neededRoles.find(neededRole => userRoles.includes(neededRole))) {

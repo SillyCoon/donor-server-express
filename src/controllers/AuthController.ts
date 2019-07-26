@@ -1,3 +1,4 @@
+import { UserRole } from './../entity/database/user-role';
 import { BaseUser } from './../entity/business/BUser';
 import { Donorinfo } from './../entity/database/donorinfo';
 import { User } from '../entity/database/user';
@@ -8,6 +9,7 @@ import { validate } from "class-validator";
 import config from "../config/config";
 import { UserHelper } from '../helpers/user-helper';
 import { Donor } from '../entity/business/Donor';
+import { WellKnownRoles } from '../entity/business/WellKnownRoles';
 
 class AuthController {
 
@@ -21,29 +23,37 @@ class AuthController {
         creatingUser.password = user.password;
         creatingUser.hashPassword();
 
-        try{
+        try {
             await userRepository.save(creatingUser);
         }
         catch (error) {
             res.status(409).send('Email is already in use');
+            return;
         }
 
-        const token = jwt.sign(
-            { userId: user.id, username: user.email, roles: [] },
-            config.jwtSecret,
-            { expiresIn: "1h" }
-        );
+        await userRepository.findOne({ where: { email: user.email }, select: ['email', 'id'] }).then(async (user) => {
 
-        //Send the jwt in the response
-        res.send(token);
+            await getRepository(UserRole).save({ userId: user.id, roleId: WellKnownRoles.basic });
+
+            const token = jwt.sign(
+                { userId: user.id, username: user.email, roles: WellKnownRoles.basic },
+                config.jwtSecret,
+                { expiresIn: "7d" }
+            );
+            res.send(token);
+        });
     }
 
     static registration = async (req: Request, res: Response) => {
-        let donor: Donor = req.body as Donor;
-        const donorRepository = getRepository(Donorinfo);
+        const donor: Donor = req.body as Donor;
+        const token: any = jwt.decode(<string>req.headers.authorization.split(' ')[1]);
 
+        const userId: number = +token['userId'];
         // Добавляем информацию о доноре
         const donorInfo: Donorinfo = {
+            id: {
+                id: userId
+            } as User,
             firstName: donor.firstName,
             lastName: donor.lastName,
             patronymic: donor.patronymic ? donor.patronymic : null,
@@ -53,15 +63,23 @@ class AuthController {
             citizenshipId: donor.hasCitizenship ? 1 : 0,
             registrationId: donor.hasRegistration ? 1 : 0
         }
+        const donorRepository = getRepository(Donorinfo);
 
-        // Добавляем пользователя и его роли
-        const user: User = new User();
+        await donorRepository.save(donorInfo);
 
-        user.password = donor.password;
-        user.email = donor.email;
-        const roles = UserHelper.getRolesFromDonorInfo(donor); 
+        // Добавляем пользователю роли
+        const rolesWithUserId: UserRole[] = UserHelper.getRolesFromDonorInfo(donor).map(role => {
+            return {
+                roleId: role,
+                userId: userId
+            } as UserRole
+        });
 
+        console.log()
+        const userRoleRepository = getRepository(UserRole);
+        await userRoleRepository.save(rolesWithUserId);
 
+        res.send('Success!');
     }
 
     static login = async (req: Request, res: Response) => {
@@ -83,13 +101,17 @@ class AuthController {
             res.status(401).send();
         }
 
+        if (!user) {
+            res.status(404).send();
+            return;
+        }
+
         //Check if encrypted password match
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
             res.status(401).send();
             return;
         }
 
-        console.log({ userId: user.id, username: user.email, roles: UserHelper.rolesToArrayOfRoleIds(user.roles) });
         //Sing JWT, valid for 1 hour
         const token = jwt.sign(
             { userId: user.id, username: user.email, roles: UserHelper.rolesToArrayOfRoleIds(user.roles) },

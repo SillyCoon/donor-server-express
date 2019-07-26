@@ -24,7 +24,6 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
         expiresIn: "1h"
     });
     res.setHeader("Authorization", `Bearer ${newToken}`);
-
     //Call the next middleware or controller
     next();
 };
