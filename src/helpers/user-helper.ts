@@ -13,7 +13,6 @@ export class UserHelper {
         donorInfo.hasBudget ? roles.push(WellKnownRoles.budget.toString()) : null;
         donorInfo.hasCitizenship ? roles.push(WellKnownRoles.citizen.toString()) : null;
         donorInfo.hasRegistration ? roles.push(WellKnownRoles.resident.toString()) : null;
-        console.log(roles);
         return roles;
     }
 }

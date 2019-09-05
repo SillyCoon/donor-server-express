@@ -1,9 +1,10 @@
-import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { IRoleOption } from './../abstract/IRoleOption';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Donorinfo } from "./donorinfo";
 
 
 @Entity("citizenship", { schema: "donorday" })
-export class Citizenship {
+export class Citizenship implements IRoleOption {
 
     @PrimaryGeneratedColumn({
         type: "int",
@@ -21,7 +22,7 @@ export class Citizenship {
 
 
 
-    @OneToMany(type => Donorinfo, donorinfo => donorinfo.citizenship, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+    @OneToMany(() => Donorinfo, donorinfo => donorinfo.citizenship, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     donorinfos: Donorinfo[];
 
 }

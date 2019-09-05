@@ -1,9 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Donorinfo } from "./donorinfo";
+import { IRoleOption } from '../abstract/IRoleOption';
 
 
 @Entity("weight", { schema: "donorday" })
-export class Weight {
+export class Weight implements IRoleOption {
 
     @PrimaryGeneratedColumn({
         type: "int",
