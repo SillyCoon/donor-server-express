@@ -25,6 +25,12 @@ export const checkRole = (neededRoles: Array<string>) => {
         if (neededRoles.find(neededRole => userRoles.includes(neededRole))) {
             next();
         }
-        else res.status(401).send();
+        else {
+            console.log('expected roles: ');
+            console.log(neededRoles);
+            console.log('user roles: ');
+            console.log(userRoles);
+            res.status(401).send();
+        }
     };
 };

@@ -49,6 +49,14 @@ class AuthController {
         const token: any = jwt.decode(<string>req.headers.authorization.split(' ')[1]);
 
         const userId: number = +token['userId'];
+
+        // Проверяем, зарегистрирован ли пользователь
+        if (await getRepository(Donorinfo).findOne(userId)) {
+            console.log(userId + ' are already registred');
+            res.status(409).send('You are already registred');
+            return;
+        }
+
         // Добавляем информацию о доноре
         const donorInfo: Donorinfo = {
             id: {
@@ -77,6 +85,8 @@ class AuthController {
         const userRoleRepository = getRepository(UserRole);
         await userRoleRepository.save(rolesWithUserId);
 
+        // Удаляем роль basic, чтобы можно было получить доступ к остальному функционалу
+        await userRoleRepository.delete({ userId: userId, roleId: WellKnownRoles.basic });
         res.send('Success!');
     }
 

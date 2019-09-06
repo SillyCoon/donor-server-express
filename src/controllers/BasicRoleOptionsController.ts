@@ -13,7 +13,7 @@ class BasicRoleOptionsController {
      * citizen,
      * resident
      * для ролей, которые выбираются при регистрации
-     * @param req - текстовое описание опции
+     * @param req
      * @param res 
      */
     public static async getOptions(req: Request, res: Response) {

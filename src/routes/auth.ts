@@ -14,6 +14,6 @@ router.post("/change-password", [checkJwt], AuthController.changePassword);
 // Только email и пароль
 router.post("/basic-registration", AuthController.basicRegistration);
 
-router.post("/registration", [checkJwt, checkRole([WellKnownRoles.donor])], AuthController.registration);
+router.post("/registration", [checkJwt, checkRole([WellKnownRoles.basic])], AuthController.registration);
 
 export default router;

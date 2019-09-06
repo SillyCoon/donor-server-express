@@ -4,6 +4,10 @@ import config from "../config/config";
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     //Get the jwt token from the head
+    if (!<string>req.headers.authorization) {
+        res.status(403).send('There is no authorization header!');
+        throw new Error('There is no authorization header!');
+    }
     const token = <string>req.headers.authorization.split(' ')[1]; // Delete word "Bearer"
     let jwtPayload;
     //Try to validate the token and get data
