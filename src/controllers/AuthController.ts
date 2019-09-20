@@ -87,7 +87,7 @@ class AuthController {
 
         // Удаляем роль basic, чтобы можно было получить доступ к остальному функционалу
         await userRoleRepository.delete({ userId: userId, roleId: WellKnownRoles.basic });
-        res.send('Success!');
+        res.status(200).send();
     }
 
     static login = async (req: Request, res: Response) => {
